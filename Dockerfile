@@ -4,7 +4,8 @@ FROM ${IMAGE_BASE} AS builder
 
 # Install dependencies for building
 COPY docker_package_install.sh /
-RUN sh /docker_package_install.sh builder
+RUN chmod +x docker_package_install.sh && \
+	 /docker_package_install.sh builder
 
 # Build Aircrack-ng
 # hadolint ignore=DL3059
@@ -47,8 +48,8 @@ COPY --from=builder /output/usr /output
 RUN set -x && \
 	[ -d /usr/local/share/man ] || \
 		mkdir -p /usr/local/share/man
-RUN mv /output/local/share/man/* /usr/local/share/man/ && \
-	rmdir /output/local/share/man/ && \
+RUN cp -r /output/local/share/man/* /usr/local/share/man/ && \
+	rm -rf /output/local/share/man && \
 	cp -r /output/* /usr/ && \
 	rm -rf /output
 
