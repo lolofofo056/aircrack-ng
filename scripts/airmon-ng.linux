@@ -863,9 +863,9 @@ stopwlIface() {
 getDriver() {
 	unset DRIVER
 	#standard detection path, this is all that is needed for proper drivers
-	DRIVER=$(printf "$ethtool_output" | awk '/driver/ {print $2}')
+	DRIVER=$(printf '%s' "${ethtool_output}" | awk '/driver/ {print $2}')
 
-	if $(modinfo -F filename ${DRIVER} > /dev/null 2>&1); then
+	if modinfo -F filename "${DRIVER}" > /dev/null 2>&1; then
     return
 	else
 		unset DRIVER
