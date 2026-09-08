@@ -944,39 +944,37 @@ getDriver() {
 
 getFrom() {
 	#from detection
-	FROM="K"
-	if [ "${MODINFO}" = "1" ] && [ -f /proc/modules ]; then
-		if modinfo -F filename "${DRIVER}" 2>&1 | grep -q 'kernel/drivers'
-		then
-			FROM="K"
+  FROM='K'
+	if [ "${MODINFO}" = '1' ] && [ -f /proc/modules ]; then
+		if modinfo -F filename "${DRIVER}" 2>&1 | grep -q 'kernel/drivers'; then
+			FROM='K'
 			#we add special handling here because we hate the vendor drivers AND they install in the wrong place
-			if [ "$DRIVER" = "r8187" ]; then
-				FROM="V"
-			elif [ "$DRIVER" = "r8187l" ]; then
-				FROM="V"
-			elif [ "$DRIVER" = "rt5390sta" ]; then
-				FROM="V"
-			elif [ "${DRIVER}" = "8812au" ] || [ "${DRIVER}" = "8814au" ]; then
-				FROM="V"
+			if [ "${DRIVER}" = 'r8187' ]; then
+				FROM='V'
+			elif [ "${DRIVER}" = 'r8187l' ]; then
+				FROM='V'
+			elif [ "${DRIVER}" = 'rt5390sta' ]; then
+				FROM='V'
+			elif [ "${DRIVER}" = '8812au' ] || [ "${DRIVER}" = "8814au" ]; then
+				FROM='V'
 			fi
-		elif modinfo -F filename "${DRIVER}" 2>&1 | grep -q 'updates/drivers'
-		then
-			FROM="C"
-		elif modinfo -F filename "${DRIVER}" 2>&1 | grep -q 'misc'
-		then
-			FROM="V"
-		elif modinfo -F filename "${DRIVER}" 2>&1 | grep -q 'staging'
-		then
-			FROM="S"
+		elif modinfo -F filename "${DRIVER}" 2>&1 | grep -q '/updates/drivers'; then
+			FROM='C'
+		elif modinfo -F filename "${DRIVER}" 2>&1 | grep -q '/misc'; then
+			FROM='V'
+		elif modinfo -F filename "${DRIVER}" 2>&1 | grep -q '/staging'; then
+			FROM='S'
+    elif modinfo -F filename "${DRIVER}" 2>&1 | grep -q '/dkms'; then
+      FROM='D'
 		else
-			FROM="?"
+			FROM='?'
 		fi
 	else
-		FROM="K"
+		FROM='K'
 	fi
   #maybe add an 'intree' check?
-	if [ "$DEBUG" = "1" ]; then
-		printf "getFrom() %s\n" "${FROM}"
+	if [ "${DEBUG}" = '1' ]; then
+		printf 'getFrom() %s\n' "${FROM}"
 	fi
 }
 
@@ -1639,6 +1637,7 @@ if [ "$VERBOSE" = "1" ]; then
 	fi
 	printf "V indicates driver comes directly from the vendor, almost certainly a bad thing\n"
 	printf "S indicates driver comes from the staging tree, these drivers are meant for reference not actual use, BEWARE\n"
+	printf "D indicates driver was built by DKMS, these drivers were built by the package manager but are of unknown quality, BEWARE\n"
 	printf "? indicates we do not know where the driver comes from... report this\n\n"
 fi
 
